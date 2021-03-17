@@ -22,7 +22,7 @@ var (
 	IntervalRangeStop  = time.Hour * 7
 )
 
-type DogAPIResponse = struct {
+type APIResponse = struct {
 	Message, Status string
 }
 
@@ -68,7 +68,7 @@ func RetrieveRandomDogPicture() (string, error) {
 		return "", err
 	}
 	defer res.Body.Close()
-	var body DogAPIResponse
+	var body APIResponse
 	err = json.NewDecoder(res.Body).Decode(&body)
 	if err != nil {
 		log.Fatal("Could not decode JSON response body while fetching dog picture", err)
