@@ -10,12 +10,12 @@ import (
 var (
 	Commands = []*discordgo.ApplicationCommand{
 		{
-			Name:        "random-dog",
+			Name:        "doggo",
 			Description: "Sends a random dog that's either a Labrador or a Golden Retriever (untreated poo poo)",
 		},
 	}
 	CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
-		"random-dog": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		"doggo": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			dogPictureUrl, err := dog.RetrieveRandomDogPicture()
 			if err != nil {
 				log.Fatal("Could not retrieve random dog picture", err)
