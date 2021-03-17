@@ -8,8 +8,9 @@ import (
 	"os/signal"
 	"randomdogs/commands"
 	"randomdogs/dog"
-	"randomdogs/util"
 )
+
+var session *discordgo.Session
 
 func main() {
 	err := godotenv.Load()
@@ -17,13 +18,13 @@ func main() {
 		log.Fatal("Error loading .env file", err)
 	}
 
-	util.Session, err = discordgo.New("Bot " + os.Getenv("BOT_TOKEN"))
+	session, err = discordgo.New("Bot " + os.Getenv("BOT_TOKEN"))
 
-	util.Session.AddHandler(func(s *discordgo.Session, e *discordgo.Ready) {
-		log.Print("Bot is ready on " + util.Session.State.User.Username + "#" + util.Session.State.User.Discriminator)
+	session.AddHandler(func(s *discordgo.Session, e *discordgo.Ready) {
+		log.Print("Bot is ready on " + session.State.User.Username + "#" + session.State.User.Discriminator)
 	})
 
-	err = util.Session.Open()
+	err = session.Open()
 	if err != nil {
 		log.Fatal("Cannot open discord bot session", err)
 	}
@@ -38,11 +39,11 @@ func main() {
 		log.Fatal("There is no dog channel ID specified in env")
 	}
 
-	commands.RegisterCommands(util.Session, guildId)
+	commands.RegisterCommands(session, guildId)
 
-	dog.DoPeriodicDogSend(dog.IntervalRangeStart)
+	dog.DoPeriodicDogSend(dog.IntervalRangeStart, session)
 
-	defer util.Session.Close()
+	defer session.Close()
 
 	stop := make(chan os.Signal)
 	signal.Notify(stop, os.Interrupt)

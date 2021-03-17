@@ -26,18 +26,18 @@ type DogAPIResponse = struct {
 	Message, Status string
 }
 
-func DoPeriodicDogSend(duration time.Duration) {
+func DoPeriodicDogSend(duration time.Duration, session *discordgo.Session) {
 	time.AfterFunc(duration, func() {
-		SendRandomDog(true)
+		SendRandomDog(session)
 	})
 }
 
-func SendRandomDog(periodic bool) {
+func SendRandomDog(session *discordgo.Session) {
 	dogPictureUrl, err := RetrieveRandomDogPicture()
 	if err != nil {
 		log.Fatal("Error while retrieving dog picture", err)
 	}
-	_, err = util.Session.ChannelMessageSendComplex(os.Getenv("DOG_CHANNEL"), &discordgo.MessageSend{
+	_, err = session.ChannelMessageSendComplex(os.Getenv("DOG_CHANNEL"), &discordgo.MessageSend{
 		Embed: &discordgo.MessageEmbed{
 			Title: "A wild doggo has appeared!",
 			Image: &discordgo.MessageEmbedImage{URL: dogPictureUrl},
@@ -47,9 +47,7 @@ func SendRandomDog(periodic bool) {
 	if err != nil {
 		log.Fatal("Could not create dog message", err)
 	}
-	if periodic {
-		DoPeriodicDogSend(time.Duration(rand.Int63n(int64(IntervalRangeStop-IntervalRangeStart)) + int64(IntervalRangeStart)))
-	}
+	DoPeriodicDogSend(time.Duration(rand.Int63n(int64(IntervalRangeStop-IntervalRangeStart))+int64(IntervalRangeStart)), session)
 }
 
 func GetRandomDogBreed() string {
