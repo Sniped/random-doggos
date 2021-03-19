@@ -45,7 +45,7 @@ func SendRandomDog(session *discordgo.Session) {
 		Embed: &discordgo.MessageEmbed{
 			Title: "A wild doggo has appeared!",
 			Image: &discordgo.MessageEmbedImage{URL: dogPicture.URL},
-			Color: util.BlueColorHexadecimal,
+			Color: util.GenerateRandomColor(),
 			Footer: &discordgo.MessageEmbedFooter{
 				Text: dogPicture.Breed,
 			},
