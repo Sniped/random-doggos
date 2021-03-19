@@ -30,7 +30,7 @@ var (
 						{
 							Title: "A doggo appears at your request!",
 							Image: &discordgo.MessageEmbedImage{URL: dogPicture.URL},
-							Color: util.BlueColorHexadecimal,
+							Color: util.GenerateRandomColor(),
 							Footer: &discordgo.MessageEmbedFooter{
 								Text:    "Requested by " + i.Member.User.Username + "#" + i.Member.User.Discriminator + " " + util.BulletPoint + " " + dogPicture.Breed,
 								IconURL: i.Member.User.AvatarURL(""),
