@@ -16,7 +16,10 @@ var (
 	}
 	CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
 		"doggo": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-			dogPictureUrl, err := dog.RetrieveRandomDogPicture()
+			if i.User != nil {
+				return
+			}
+			dogPicture, err := dog.RetrieveRandomDogPicture()
 			if err != nil {
 				log.Fatal("Could not retrieve random dog picture", err)
 			}
@@ -26,8 +29,12 @@ var (
 					Embeds: []*discordgo.MessageEmbed{
 						{
 							Title: "A doggo appears at your request!",
-							Image: &discordgo.MessageEmbedImage{URL: dogPictureUrl},
+							Image: &discordgo.MessageEmbedImage{URL: dogPicture.URL},
 							Color: util.BlueColorHexadecimal,
+							Footer: &discordgo.MessageEmbedFooter{
+								Text:    "Requested by " + i.Member.User.Username + "#" + i.Member.User.Discriminator + " " + util.BulletPoint + " " + dogPicture.Breed,
+								IconURL: i.Member.User.AvatarURL(""),
+							},
 						},
 					},
 				},

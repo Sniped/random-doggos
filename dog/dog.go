@@ -26,6 +26,10 @@ type APIResponse = struct {
 	Message, Status string
 }
 
+type Picture = struct {
+	URL, Breed string
+}
+
 func DoPeriodicDogSend(duration time.Duration, session *discordgo.Session) {
 	time.AfterFunc(duration, func() {
 		SendRandomDog(session)
@@ -33,15 +37,18 @@ func DoPeriodicDogSend(duration time.Duration, session *discordgo.Session) {
 }
 
 func SendRandomDog(session *discordgo.Session) {
-	dogPictureUrl, err := RetrieveRandomDogPicture()
+	dogPicture, err := RetrieveRandomDogPicture()
 	if err != nil {
 		log.Fatal("Error while retrieving dog picture", err)
 	}
 	_, err = session.ChannelMessageSendComplex(os.Getenv("DOG_CHANNEL"), &discordgo.MessageSend{
 		Embed: &discordgo.MessageEmbed{
 			Title: "A wild doggo has appeared!",
-			Image: &discordgo.MessageEmbedImage{URL: dogPictureUrl},
+			Image: &discordgo.MessageEmbedImage{URL: dogPicture.URL},
 			Color: util.BlueColorHexadecimal,
+			Footer: &discordgo.MessageEmbedFooter{
+				Text: dogPicture.Breed,
+			},
 		},
 	})
 	if err != nil {
@@ -62,10 +69,11 @@ func GetRandomDogBreed() string {
 	return dogBreedKeys[rand.Intn(len(Breeds))]
 }
 
-func RetrieveRandomDogPicture() (string, error) {
-	res, err := http.Get(ApiUri + "/breed/" + Breeds[GetRandomDogBreed()] + "/images/random")
+func RetrieveRandomDogPicture() (Picture, error) {
+	breed := GetRandomDogBreed()
+	res, err := http.Get(ApiUri + "/breed/" + Breeds[breed] + "/images/random")
 	if err != nil {
-		return "", err
+		return Picture{}, err
 	}
 	defer res.Body.Close()
 	var body APIResponse
@@ -73,5 +81,5 @@ func RetrieveRandomDogPicture() (string, error) {
 	if err != nil {
 		log.Fatal("Could not decode JSON response body while fetching dog picture", err)
 	}
-	return body.Message, nil
+	return Picture{URL: body.Message, Breed: breed}, nil
 }
